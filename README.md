@@ -1,4 +1,4 @@
 bitcoind
 ========
 
-Implementation of the bitcoin daemo in elixir
+Implementation of the bitcoind daemon in [Elixir](http://elixir-lang.org/).
