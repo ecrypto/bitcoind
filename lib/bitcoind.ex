@@ -1,0 +1,2 @@
+defmodule Bitcoind do
+end
