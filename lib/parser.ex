@@ -1,6 +1,6 @@
 defmodule Parser do
   defmodule Block do
-    defstruct magic: <<>>, size: <<>>, header: <<>>
+    defstruct magic: <<>>, size: <<>>, header: <<>>, tx_counter: 0
   end
   defmodule BlockHeader do
     defstruct version: <<>>, hash_prev_block: <<>>, hash_merkle_root: <<>>, time: <<>>, bits: <<>>, nonce: <<>>
@@ -10,20 +10,24 @@ defmodule Parser do
                   size :: little-integer-size(32),
                   header :: binary-size(80),
                   rest :: binary>>)  do
+    {tx_counter, rest} = parse_varint(rest)
     block = %Block{
               magic: magic,
               size: size,
               header: parse_block_header(header),
+              tx_counter: tx_counter
           }
     {:ok, block, rest}
   end
 
-  def parse_block_header(<<version :: little-integer-size(32),
-                         hash_prev_block :: binary-size(32),
-                         hash_merkle_root :: binary-size(32),
-                         time :: little-integer-size(32),
-                         bits :: binary-size(4),
-                         nonce :: little-integer-size(32)>>) do
+  def parse_block_header(
+        <<version :: little-integer-size(32),
+        hash_prev_block :: binary-size(32),
+        hash_merkle_root :: binary-size(32),
+        time :: little-integer-size(32),
+        bits :: binary-size(4),
+        nonce :: little-integer-size(32)>>
+      ) do
     %BlockHeader{
             version: version,
             hash_prev_block: hash_prev_block,

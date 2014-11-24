@@ -8,8 +8,9 @@ defmodule ParserTest do
 
     assert block.magic == <<0xf9, 0xbe, 0xb4, 0xd9>>
     assert block.size == 0x11d
-    # assert block.header == <<"">>
+    assert block.tx_counter == 1
   end
+
 
 
   test "Parse a blockchain header" do
@@ -20,6 +21,8 @@ defmodule ParserTest do
     assert header.version == 1
     assert header.hash_prev_block == <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
     assert header.hash_merkle_root == <<0x3b, 0xa3,0xed,0xfd,0x7a,0x7b,0x12,0xb2,0x7a,0xc7,0x2c,0x3e,0x67,0x76,0x8f,0x61,0x7f,0xc8,0x1b,0xc3,0x88,0x8a,0x51,0x32,0x3a,0x9f,0xb8,0xaa,0x4b,0x1e,0x5e,0x4a>>
+  end
+
   test "Parse varint" do
     # uint8
     assert Parser.parse_varint(<<0x00>>) == {0, <<>>}
