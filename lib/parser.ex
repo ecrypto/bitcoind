@@ -33,4 +33,39 @@ defmodule Parser do
             nonce: nonce,
         }
   end
+
+  @doc """
+  Parse a var int.
+
+  * If first byte is less than < 0xfd, return the value of it.
+  * If first byte is 0xfd the next two bytes are the value.
+  * If first byte is 0xfe the next four bytes are the value.
+  * If first byte is 0xff the next eight bytes are the value.
+
+  All values are little-endian.
+  """
+  def parse_varint(<<val>>) when val < 0xfd do
+    {val, <<>>}
+  end
+  def parse_varint(<<val :: little-integer-size(8), rest :: binary>>) when val < 0xfd do
+    {val, rest}
+  end
+  def parse_varint(<<0xfd, val :: little-integer-size(16)>>)  do
+    {val, <<>>}
+  end
+  def parse_varint(<<0xfd, val :: little-integer-size(16), rest :: binary>>)  do
+    {val, rest}
+  end
+  def parse_varint(<<0xfe, val :: little-integer-size(32)>>)  do
+    {val, <<>>}
+  end
+  def parse_varint(<<0xfe, val :: little-integer-size(32), rest :: binary>>)  do
+    {val, rest}
+  end
+  def parse_varint(<<0xff, val :: little-integer-size(64)>>)  do
+    {val, <<>>}
+  end
+  def parse_varint(<<0xff, val :: little-integer-size(64), rest :: binary>>)  do
+    {val, rest}
+  end
 end

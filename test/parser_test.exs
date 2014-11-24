@@ -20,5 +20,25 @@ defmodule ParserTest do
     assert header.version == 1
     assert header.hash_prev_block == <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
     assert header.hash_merkle_root == <<0x3b, 0xa3,0xed,0xfd,0x7a,0x7b,0x12,0xb2,0x7a,0xc7,0x2c,0x3e,0x67,0x76,0x8f,0x61,0x7f,0xc8,0x1b,0xc3,0x88,0x8a,0x51,0x32,0x3a,0x9f,0xb8,0xaa,0x4b,0x1e,0x5e,0x4a>>
+  test "Parse varint" do
+    # uint8
+    assert Parser.parse_varint(<<0x00>>) == {0, <<>>}
+    assert Parser.parse_varint(<<0xfc>>) == {0xfc, <<>>}
+    assert Parser.parse_varint(<<0xfc, 0xaa>>) == {0xfc, <<0xaa>>}
+
+    # uint16
+    assert Parser.parse_varint(<<0xfd, 0x00, 0x00>>) == {0, <<>>}
+    assert Parser.parse_varint(<<0xfd, 0xffff :: size(16)>>) == {0xffff, <<>>}
+    assert Parser.parse_varint(<<0xfd, 0xffff :: size(16), 0xaa>>) == {0xffff, <<0xaa>>}
+
+    # uint32
+    assert Parser.parse_varint(<<0xfe, 0x00000000 :: size(32)>>) == {0, <<>>}
+    assert Parser.parse_varint(<<0xfe, 0xffffffff :: size(32)>>) == {0xffffffff, <<>>}
+    assert Parser.parse_varint(<<0xfe, 0xffffffff :: size(32), 0xaa>>) == {0xffffffff, <<0xaa>>}
+
+    # uint64
+    assert Parser.parse_varint(<<0xff, 0x0000000000000000 :: size(64)>>) == {0, <<>>}
+    assert Parser.parse_varint(<<0xff, 0xffffffffffffffff :: size(64)>>) == {0xffffffffffffffff, <<>>}
+    assert Parser.parse_varint(<<0xff, 0xffffffffffffffff :: size(64), 0xaa>>) == {0xffffffffffffffff, <<0xaa>>}
   end
 end
