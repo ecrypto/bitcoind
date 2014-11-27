@@ -4,7 +4,7 @@ defmodule Bitcoind.Mixfile do
   def project do
     [app: :bitcoind,
      version: "0.0.1",
-     elixir: "~> 1.1-dev",
+     elixir: "~> 1.0.2",
      deps: deps]
   end
 
