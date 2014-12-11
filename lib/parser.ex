@@ -1,11 +1,13 @@
-defmodule Parser do
-  defmodule Block do
-    defstruct magic: <<>>, size: <<>>, header: <<>>, tx_counter: 0
-  end
-  defmodule BlockHeader do
-    defstruct version: <<>>, hash_prev_block: <<>>, hash_merkle_root: <<>>, time: <<>>, bits: <<>>, nonce: <<>>
-  end
 
+defmodule Block do
+  defstruct magic: <<>>, size: <<>>, header: <<>>, tx_counter: 0
+end
+
+defmodule BlockHeader do
+  defstruct version: <<>>, hash_prev_block: <<>>, hash_merkle_root: <<>>, time: <<>>, bits: <<>>, nonce: <<>>
+end
+
+defmodule Parser do
   def parse_block(<<magic :: binary-size(4),
                   size :: little-integer-size(32),
                   header :: binary-size(80),
