@@ -28,16 +28,19 @@ defmodule Parser do
         hash_merkle_root :: binary-size(32),
         time :: little-integer-size(32),
         bits :: binary-size(4),
-        nonce :: little-integer-size(32)>>
+        nonce :: little-integer-size(32),
+        rest :: binary>>
       ) do
-    %BlockHeader{
-            version: version,
-            hash_prev_block: hash_prev_block,
-            hash_merkle_root: hash_merkle_root,
-            time: time,
-            bits: bits,
-            nonce: nonce,
-        }
+    header = %BlockHeader{
+               version: version,
+               hash_prev_block: hash_prev_block,
+               hash_merkle_root: hash_merkle_root,
+               time: time,
+               bits: bits,
+               nonce: nonce,
+           }
+    {:ok, header, rest}
+  end
   end
 
   @doc """
