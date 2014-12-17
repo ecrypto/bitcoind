@@ -25,6 +25,19 @@ defmodule Parser do
   """
 
   @doc """
+  Get raw data for next block.
+  """
+  def get_raw_block(<<magic :: binary-size(4),
+        size :: little-integer-size(32),
+        block :: binary-size(size),
+        rest :: binary>>) do
+    {:ok, <<magic :: binary, size :: little-integer-size(32), block :: binary>>, rest}
+  end
+  def get_raw_block(data) do
+    {:error, :incomplete_block, data}
+  end
+
+  @doc """
   Parse a blockchain block.
   """
   def parse_block(<<magic :: binary-size(4),
