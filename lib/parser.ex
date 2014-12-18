@@ -24,6 +24,8 @@ defmodule Parser do
   Parser is a module containing functions used to parse the blockchain.
   """
 
+  @block_hdr_magic_number <<0xf9,0xbe,0xb4,0xd9>>
+
   @doc """
   Get raw data for next block.
   """
@@ -40,7 +42,7 @@ defmodule Parser do
   @doc """
   Parse a blockchain block.
   """
-  def parse_block(<<magic :: binary-size(4),
+  def parse_block(<< @block_hdr_magic_number :: binary,
                   size :: little-integer-size(32),
                   header :: binary-size(80),
                   rest :: binary>>)  do
@@ -56,13 +58,17 @@ defmodule Parser do
     {:ok, txs, rest} = iterate_bin_to_list(rest, func, [], tx_counter)
 
     block = %Block{
-              magic: magic,
+              magic: @block_hdr_magic_number,
               size: size,
               header: header,
               tx_counter: tx_counter,
               transactions: txs,
           }
     {:ok, block, rest}
+  end
+
+  def parse_block(_) do
+    {:error, :invalid_block_magic_number}
   end
 
   @doc """
