@@ -1,13 +1,8 @@
 defmodule ParseBlockChain do
-  @blockchain "/home/nobackup/blockhain/bootstrap.dat"
-  @readsize 1000000
+  @readsize 10000000
 
-  def openblockchain do
-    File.open(@blockchain, [:read])
-  end
-
-  def parse_entire_file do
-    {:ok, file} = openblockchain()
+  def parse_entire_file(bc_file) do
+    {:ok, file} = File.open(bc_file, [:read])
     count_all_blocks(file, <<>>, 0)
     File.close(file)
   end
