@@ -1,10 +1,15 @@
 defmodule ParseBlockChain do
   @readsize 10000000
 
-  def walk_entire_file(bc_file, action) do
+  @doc """
+  Iterate over a blockchain file and execute the action specified.
+  """
+  @spec walk_file(String.t, atom) :: {:ok, any}
+  def walk_file(bc_file, action) do
     {:ok, file} = File.open(bc_file, [:read])
-    do_walk_file(file, action)
+    res = do_walk_file(file, action)
     File.close(file)
+    {:ok, res}
   end
 
   defp do_walk_file(file, :parse_and_forget) do
@@ -36,7 +41,7 @@ defmodule ParseBlockChain do
     end
   end
 
-  def get_next_chunk(file) do
+  defp get_next_chunk(file) do
     case IO.binread(file, @readsize) do
       :eof ->
         []
@@ -45,6 +50,11 @@ defmodule ParseBlockChain do
     end
   end
 
+  @doc """
+  Given some data and a block handler, iterate over the data
+  and when done return the accumulator and any remaining data.
+  """
+  @spec walk_raw_blocks(binary, fun, any) :: {:ok, any, binary}
   def walk_raw_blocks(data, block_handler, acc) do
     case Parser.get_raw_block(data) do
       {:ok, block, rest} ->

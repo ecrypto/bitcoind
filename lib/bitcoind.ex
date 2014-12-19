@@ -11,9 +11,9 @@ defmodule Bitcoind do
                                   aliases:  [h: :help])
     case options do
       {[help: true], _, _} -> print_help()
-      {[count_blocks: file], _, _} -> ParseBlockChain.walk_entire_file(file, :count)
-      {[parse_and_forget: file], _, _} -> ParseBlockChain.walk_entire_file(file, :parse_and_forget)
-      x -> IO.puts("Unknown argument")
+      {[count_blocks: file], _, _} -> ParseBlockChain.walk_file(file, :count)
+      {[parse_and_forget: file], _, _} -> ParseBlockChain.walk_file(file, :parse_and_forget)
+      _ -> IO.puts("Unknown argument")
     end
   end
 
