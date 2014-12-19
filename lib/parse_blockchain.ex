@@ -1,50 +1,57 @@
 defmodule ParseBlockChain do
   @readsize 10000000
 
-  def parse_entire_file(bc_file) do
+  def walk_entire_file(bc_file, action) do
     {:ok, file} = File.open(bc_file, [:read])
-    count_all_blocks(file, <<>>, 0)
+    do_walk_file(file, action)
     File.close(file)
   end
 
-  def count_all_blocks(file, rest, num_blocks) do
-    case parse_next_chunk(file, rest) do
+  defp do_walk_file(file, :parse_and_forget) do
+    walk_all_blocks(file, <<>>, &parse_and_forget_blocks/2, 0)
+  end
+  defp do_walk_file(file, :count) do
+    walk_all_blocks(file, <<>>, &count_blocks/2, 0)
+  end
+
+  defp count_blocks(_raw_block, num_blocks) do
+    if rem(num_blocks, 1000) == 0 do
+      IO.puts("Counted #{num_blocks} blocks...")
+    end
+    {:ok, 1 + num_blocks}
+  end
+
+  defp parse_and_forget_blocks(raw_block, _) do
+    Parser.parse_block(raw_block)
+    {:ok, :nothing}
+  end
+
+  defp walk_all_blocks(file, rest, block_handler, acc) do
+    case get_next_chunk(file) do
       [] ->
-        :done
-      {:ok, blocks, rest} ->
-        num_blocks = num_blocks + length(blocks)
-        IO.puts("Parsed #{num_blocks} blocks...")
-        count_all_blocks(file, rest, num_blocks)
+        acc
+      data ->
+        {:ok, acc, rest} = walk_raw_blocks(<<rest :: binary, data :: binary>>, block_handler, acc)
+        walk_all_blocks(file, rest, block_handler, acc)
     end
   end
 
-  def parse_next_chunk(file, rest) do
+  def get_next_chunk(file) do
     case IO.binread(file, @readsize) do
       :eof ->
         []
       data ->
-        parse_available_blocks(<<rest :: binary, data :: binary>>)
+        data
     end
   end
 
-  @doc """
-  Parse and return all blocks in the given data. Any remaining data
-  not representing an entire block is returned as well.
-  """
-  def parse_available_blocks(data) do
-    parse_blocks(data, [])
-  end
-
-  defp parse_blocks(data, blocks) do
-    res = Parser.get_raw_block(data)
-    case res do
+  def walk_raw_blocks(data, block_handler, acc) do
+    case Parser.get_raw_block(data) do
       {:ok, block, rest} ->
-        {:ok, parsed_block, <<>>} = Parser.parse_block(block)
-        #IO.puts("parsed block")
-        parse_blocks(rest, [parsed_block | blocks])
+        {:ok, acc} = block_handler.(block, acc)
+        walk_raw_blocks(rest, block_handler, acc)
       {:error, :incomplete_block, rest} ->
-        #IO.puts("incomplete block")
-        {:ok, Enum.reverse(blocks), rest}
+         {:ok, acc, rest}
     end
   end
 end

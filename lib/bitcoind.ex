@@ -4,19 +4,22 @@ defmodule Bitcoind do
   end
 
   def parse_args(args) do
-    options = OptionParser.parse(args, switches: 
+    options = OptionParser.parse(args, switches:
                                  [help: :boolean,
-                                  parse: :string],
+                                  count_blocks: :string,
+                                  parse_and_forget: :string],
                                   aliases:  [h: :help])
     case options do
       {[help: true], _, _} -> print_help()
-      {[parse: file], _, _} -> ParseBlockChain.parse_entire_file(file)
+      {[count_blocks: file], _, _} -> ParseBlockChain.walk_entire_file(file, :count)
+      {[parse_and_forget: file], _, _} -> ParseBlockChain.walk_entire_file(file, :parse_and_forget)
       x -> IO.puts("Unknown argument")
     end
   end
 
   defp print_help() do
-    IO.puts("--help                   This information.")
-    IO.puts("--parse=path_to_file     Parses the given blockchain.")
+    IO.puts("--help                              This information.")
+    IO.puts("--parse-and-forget=path_to_file     Parse and throw results away.")
+    IO.puts("--count-blocks=path_to_file         Count the number of blocks.")
   end
 end
