@@ -5,7 +5,8 @@ defmodule Bitcoind.Mixfile do
     [app: :bitcoind,
      version: "0.0.1",
      elixir: "~> 1.0.2",
-     deps: deps]
+     deps: deps,
+     escript: escript]
   end
 
   # Configuration for the OTP application
@@ -27,5 +28,9 @@ defmodule Bitcoind.Mixfile do
   defp deps do
     [{:earmark, "~> 0.1", only: :dev},
      {:ex_doc, "~> 0.6", only: :dev}]
+  end
+
+  def escript do
+    [main_module: Bitcoind]
   end
 end
